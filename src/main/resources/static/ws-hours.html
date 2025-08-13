@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>WS Hours</title></head>
+<body>
+<h3>Raw WebSocket – /ws/hours</h3>
+<label>Start: <input id="s" type="date" value="2025-08-01"></label>
+<label>End: <input id="e" type="date" value="2025-08-07"></label>
+<button id="ask">Summarize</button>
+<button id="ping">Ping</button>
+<pre id="log"></pre>
+
+<script>
+    const log = m => { const el = document.getElementById('log'); el.textContent += m + "\n"; el.scrollTop = el.scrollHeight; };
+    const ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/hours');
+
+    ws.onopen    = () => log('connected');
+    ws.onclose   = e  => log('closed ' + e.code);
+    ws.onerror   = e  => log('error ' + (e.message || e));
+    ws.onmessage = ev => log('msg: ' + ev.data);
+
+    document.getElementById('ping').onclick = () => ws.send('ping');
+    document.getElementById('ask').onclick  = () => {
+        const start = document.getElementById('s').value;
+        const end   = document.getElementById('e').value;
+        ws.send(JSON.stringify({ type: 'summarize_hours', start, end }));
+        log('sent summarize_hours ' + start + ' .. ' + end);
+    };
+</script>
+</body>
+</html>

@@ -1,8 +1,17 @@
+buildscript {
+    repositories { mavenCentral() }
+    dependencies { classpath "org.flywaydb:flyway-database-oracle:11.11.0" }
+}
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.4'
     id 'io.spring.dependency-management' version '1.1.7'
+    id "org.flywaydb.flyway" version "11.11.0"
 }
+
+def flywayVersion = "11.11.0"
+
 
 group = 'com.yusufu'
 version = '0.0.1-SNAPSHOT'
@@ -28,8 +37,24 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.batch:spring-batch-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+
+    implementation "org.flywaydb:flyway-core:${flywayVersion}"
+    implementation "org.flywaydb:flyway-database-oracle:${flywayVersion}"
+    // Oracle JDBC
+    runtimeOnly "com.oracle.database.jdbc:ojdbc11:23.7.0.25.01"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0"
+
+}
+flyway {
+    url = 'jdbc:oracle:thin:@//localhost:1521/XEPDB1'
+    user = 'appuser'
+    password = 'StrongPwd123'
+    schemas = ['appuser']
+    locations = ['classpath:db/migration']
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+
